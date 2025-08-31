@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="keywords" content="guessing game, word game, fun game">
+    <meta name="description" content="A fun and interactive word guessing game for all ages.">
+    <meta name="author" content="Eyad Ahmed El-Tomey">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<style>
+        :root {
+            --main-bg: #d7d5d5;
+            --main-text: #323232; 
+            --true-color: #119823;
+            --midd-color: #e7b017;
+            --false-color: #cf1919;
+        }
+
+        * {
+            border: none;
+            background: none;
+            outline: none;
+            box-sizing: border-box;
+            &:not(h2) {
+            font-size: large;
+            font-weight: bold;
+            }
+        }
+
+        body {
+            height: 97vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .game-area {
+            background-color: var(--main-bg);
+            width: 1000px;
+            height: 460px;
+            padding: 20px;
+            margin: auto;
+            border-radius: 20px;
+            -webkit-border-radius: 20px;
+            -moz-border-radius: 20px;
+            -ms-border-radius: 20px;
+            -o-border-radius: 20px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            .gussing-area {
+                width: 50%;
+                margin: 10px;
+                height: 97%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+                .inputs-area {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-around;
+                    height: 70%;
+                    .tries {
+                        
+                        span {
+                            margin-right: 30px;
+                            font-size: larger;
+                        }
+                        input {
+                            width: 50px;
+                            height: 50px;
+                            border: none;
+                            border-bottom: 2px solid var(--main-text);
+                            margin-right: 5px;
+                            font-size: 30px;
+                            text-align: center;
+                        }
+                    }
+                }
+                .buttons {
+                    width: 100%;
+                    height: 42px;
+                    display: flex;
+                    justify-content: space-around;
+                    color: var(--main-bg);
+                    .check {
+                        background-color: #0909ac;
+                        width: 60%;
+                        border-radius: 20px;
+                        -webkit-border-radius: 20px;
+                        -moz-border-radius: 20px;
+                        -ms-border-radius: 20px;
+                        -o-border-radius: 20px;
+                        color: var(--main-bg);
+                    }
+                    .hint {
+                        background-color: var(--false-color);
+                        width: 30%;
+                        border-radius: 20px;
+                        -webkit-border-radius: 20px;
+                        -moz-border-radius: 20px;
+                        -ms-border-radius: 20px;
+                        -o-border-radius: 20px;
+                        color: var(--main-bg);
+                    }
+                }
+            }
+            .keys-area{
+                width: 30%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+                height: 80%;
+                .keys {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    background-color: #eeecec;
+                    border-radius: 10px;
+                    -webkit-border-radius: 10px;
+                    -moz-border-radius: 10px;
+                    -ms-border-radius: 10px;
+                    -o-border-radius: 10px;
+                    padding: 10px;
+                    .color{
+                        border-radius: 50%;
+                        -webkit-border-radius: 50%;
+                        -moz-border-radius: 50%;
+                        -ms-border-radius: 50%;
+                        -o-border-radius: 50%;
+                        width: 30px;
+                        height: 30px;
+                        &.true {
+                            background-color: var(--true-color);
+                        }
+                        &.midd {
+                            background-color: var(--midd-color);
+                        }
+                        &.false {
+                            background-color: var(--false-color);
+                        }
+                    }
+                }
+            }
+        }
+
+        .true {
+            background-color: var(--true-color);
+        }
+        .midd {
+            background-color: var(--midd-color);
+        }
+        .false {
+            background-color: var(--false-color);
+        }
+        .disables-inputs , .disables-inputs input{
+            opacity: 0.5;
+            pointer-events: none;
+            cursor: none;
+        }
+
+        .disables-after {
+            opacity: 0.3;
+            pointer-events: none;
+            cursor: none;
+        }
+    </style>
+	<title>Learn JavaScript</title>
+</head>
+<body>
+	<div class="game-area">
+		<div class="gussing-area">
+			<div class="inputs-area" id="inputsArea"></div>
+			<div class="buttons">
+				<button class="check" id="check">check the name</button>
+				<button class="hint" id="hint"><span></span> hint</button>
+			</div>
+		</div>
+		<div class="keys-area">
+			<h2>keys</h2>
+			<div class="keys">
+				<div class="color true"></div>
+				<div class="key-text">letter true and in place</div>
+			</div>
+			<div class="keys">
+				<div class="color midd"></div>
+				<div class="key-text">letter true but not in place</div>
+			</div>
+			<div class="keys">
+				<div class="color false"></div>
+				<div class="key-text">letter is false</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+        let numOfTries = 6;
+        let numOfLetters = 7; 
+        let currentTry = 1;
+
+        let wordsToGuese = [
+        "planet", "breeze", "castle", "silver", "forest", "rocket", "stream", "button", "circle", "danger",
+        "fabric", "gather", "honest", "island", "jungle", "kitten", "legend", "magnet", "nature", "object",
+        "puzzle", "quartz", "rescue", "saddle", "ticket", "united", "valley", "wander", "yellow", "zigzag",
+        "anchor", "belief", "custom", "dragon", "effort", "frozen", "glance", "hammer", "impact", "jockey",
+        "kernel", "laptop", "moment", "notice", "orange", "pirate", "quiver", "ribbon", "socket", "tunnel"
+        ];
+        let theWord = wordsToGuese[Math.floor(Math.random() * wordsToGuese.length)].toLowerCase();
+        console.log(theWord)
+
+        let inputContainer = document.getElementById("inputsArea");
+        let checkBtn = document.getElementById("check");
+
+        function generateInputs() {
+
+        for (let i = 1; i <= numOfTries; i++) {
+            let tryHolder = document.createElement("div");
+            tryHolder.innerHTML = `<span>try-${i}</span>`;
+            tryHolder.id = `try${i}`;
+            tryHolder.classList.add("tries")
+            if (i !== 1) {
+                tryHolder.classList.add("disables-inputs");
+            };
+
+            for (let j = 1; j < numOfLetters; j++) {
+                let input = document.createElement("input");
+                input.type = "text";
+                input.setAttribute("maxLength", "1");
+                input.id = `try${i}-letter${j}`;
+                tryHolder.appendChild(input)
+            };
+            
+            inputContainer.appendChild(tryHolder);
+        };
+        inputContainer.children[0].children[1].focus()
+
+        let disabledINputs = document.querySelectorAll(".disables-inputs input");
+        disabledINputs.forEach(inp => inp.disabled = true)
+
+        let inputs = document.querySelectorAll("input");
+        inputs.forEach((inp , i) => {
+            inp.addEventListener("input", () => {
+                let bro = inputs[i + 1];
+                if (bro) bro.focus()
+            });
+
+            inp.addEventListener("keydown", (event) => {
+            let currInpIndex = Array.from(inputs).indexOf(event.target);
+            if (event.key === "Backspace") {
+                event.preventDefault();
+                let thisInp = currInpIndex;
+                if (thisInp == i) {
+                    inputs[thisInp].value = "";
+                    inputs[thisInp - 1].focus()
+                };
+            } else {
+                if (event.key === "ArrowRight") {
+                    let nextBro = currInpIndex + 1;
+                    if (nextBro < inputs.length) inputs[nextBro].focus();
+                } else if (event.key === "ArrowLeft") {
+                    let prevBro = currInpIndex - 1;
+                    if (prevBro >= 0) inputs[prevBro].focus();
+                };
+            };
+            });
+        });
+        };
+
+        checkBtn.addEventListener("click", () => {  checkBTN()  })
+
+        function checkBTN() {
+        let success = true;
+        for (let i = 1; i < numOfLetters; i++) {
+            let inputs = document.querySelector(`#try${currentTry}-letter${i}`);
+            let letter = inputs.value.toLowerCase();
+            if (theWord[i - 1] === letter && letter !== "") {
+                inputs.classList.add("true");
+            } else if (theWord.includes(letter) && letter !== "") {
+                inputs.classList.add("midd");
+                success = false;
+            } else {
+                inputs.classList.add("false");
+                success = false;
+            }
+        }
+
+        if (!success) {
+            // Disable current try
+            let currentTryElement = document.querySelector(`#try${currentTry}`);
+            if (currentTryElement) {
+                currentTryElement.classList.add("disables-after");
+                let currentInputs = currentTryElement.querySelectorAll("input");
+                currentInputs.forEach(input => input.disabled = true);
+            }
+
+            // Move to the next try
+            currentTry++;
+
+            // Enable the next try
+            let nextTryElement = document.querySelector(`#try${currentTry}`);
+            if (nextTryElement) {
+                nextTryElement.classList.remove("disables-inputs");
+                let nextInputs = nextTryElement.querySelectorAll("input");
+                nextInputs.forEach(input => input.disabled = false);
+                // Focus the first input in the next try
+                let firstInput = nextTryElement.querySelector("input");
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            } else {
+                // Handle game over (no more tries)
+                let over = document.createElement("div");
+                over.innerHTML = "Game Over! No more tries. <br> The word was: " + theWord;
+                over.style.cssText = `
+                    color: red; 
+                    font-size: 24px; 
+                    text-align: center;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                `;
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+                document.body.appendChild(over);
+                document.getElementsByClassName("game-area")[0].style.opacity = "0.5";
+            }
+        } else {
+            // Handle successful guess
+            // console.log("Congratulations! You guessed the word!");
+            let win = document.createElement("div");
+            win.innerHTML = "Congratulations! You guessed the word!";
+            win.style.cssText = `
+            color: green;
+            font-size: 24px;
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            `;
+            setTimeout(() => {
+            window.location.reload();
+            }, 2000);
+            document.body.appendChild(win);
+            document.getElementsByClassName("game-area")[0].style.opacity = "0.5";
+        }
+        }
+        window.addEventListener("DOMContentLoaded", () => {
+        generateInputs();
+        
+        })
+    </script>
+</body>
+</html>
